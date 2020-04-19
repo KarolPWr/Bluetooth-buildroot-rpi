@@ -14,12 +14,8 @@ fi
 ## PermitRootLogin for ssh
 sed -i '/#PermitRootLogin prohibit-password/c\PermitRootLogin yes' output/target/etc/ssh/sshd_config 
 
-## change prompt to raspi> with red color
-sed -i "/export PS1=/c\                 export PS1='\\\e[0;31mraspi> \\\e[m '"  output/target/etc/profile
-
 
 ################# Enabling Wifi #######################################
-sudo chmod 777 ${TARGET_DIR}/etc/wpa_supplicant
 if [ ! -f "${TARGET_DIR}/etc/wpa_supplicant.conf" ]; then
 	sudo touch ${TARGET_DIR}/etc/wpa_supplicant.conf
 fi
