@@ -50,3 +50,27 @@ network={
 
 
 EOL
+
+
+#write enable_uart=1
+if ! grep -qE '^enable_uart=1' "${BINARIES_DIR}/rpi-firmware/config.txt"; then
+			cat << __EOF__ >> "${BINARIES_DIR}/rpi-firmware/config.txt"
+
+# enable rpi3 ttyS0 serial console
+enable_uart=1
+__EOF__
+fi
+
+#write core_freq=250
+if ! grep -qE '^core_freq=250' "${BINARIES_DIR}/rpi-firmware/config.txt"; then
+			cat << __EOF__ >> "${BINARIES_DIR}/rpi-firmware/config.txt"
+
+# adjust core_freq to enable BT adapter
+core_freq=250
+__EOF__
+fi
+
+
+
+
+
