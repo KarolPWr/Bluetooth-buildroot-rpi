@@ -19,6 +19,8 @@
 #include <bluetooth/hci.h>
 #include <bluetooth/hci_lib.h>
 
+#define for_each_opt(opt, long, short) while ((opt=getopt_long(argc, argv, short ? short:"+", long, NULL)) != -1)
+
 static volatile int signal_received = 0;
 
 static struct option lescan_options[] = {
