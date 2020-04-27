@@ -209,6 +209,19 @@ static void cmd_lescan(int dev_id, int argc, char **argv)
 	hci_close_dev(dd);
 }
 
+static int dev_info(int s, int dev_id, long arg)
+{
+	struct hci_dev_info di = { .dev_id = dev_id };
+	char addr[18];
+
+	if (ioctl(s, HCIGETDEVINFO, (void *) &di))
+		return 0;
+
+	ba2str(&di.bdaddr, addr);
+	printf("\t%s\t%s\n", di.name, addr);
+	return 0;
+}
+
 
 int main(int argc, char *argv[])
 {
@@ -226,6 +239,8 @@ int main(int argc, char *argv[])
 		perror("Device is not available");
 		exit(1);
 	}
+
+	cmd_lescan(dev_id, argc, argv);
 
 	return 0;
 }
