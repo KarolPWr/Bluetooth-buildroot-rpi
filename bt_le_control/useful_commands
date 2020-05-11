@@ -1,0 +1,40 @@
+
+
+sudo gatttool -t random -b DB:1A:7C:4D:6D:4B -I  # open interactive mode with the device
+
+[DB:1A:7C:4D:6D:4B][LE]> connect  # connect to device
+
+char-desc # list handles to characteristics
+
+char-read-hnd <handle> # read handle, returns is in network endian (big endian)
+
+Main algo:
+- Check HW adapter (done)
+- Scan for specific address (my app)
+- Connect to device
+- Discover characteristics 
+- Search for temperature char
+- Get handle to temperature char
+- Read and convert characteristics
+- Store read value
+
+
+
+
+
+
+
+
+
+
+
+
+Refs:
+https://www.jaredwolff.com/get-started-with-bluetooth-low-energy/#!
+
+https://stackoverflow.com/questions/32947807/cannot-connect-to-ble-device-on-raspberry-pi
+
+https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/tools/hcitool.c
+
+
+

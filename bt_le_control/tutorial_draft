@@ -1,0 +1,14 @@
+
+
+Get sources: bluez, ell, dependencies
+http://www.bt-test.systems/wp-content/uploads/2019/03/T1804_How-to-set-up-BlueZ_LFC_FINAL-2.pdf
+
+Compile and install Bluez 
+
+copy gdlib from bluez folder to /usr/include
+$ sudo cp -r ./gdbus/ /usr/include
+
+
+fix glibconfig.h: https://github.com/dusty-nv/jetson-inference/issues/6 
+
+compile example with proper include flags for dbus - to be continued
