@@ -51,9 +51,11 @@ static int dev_info(int s, int dev_id, long arg)
 	struct hci_dev_info di = { .dev_id = dev_id };
 	char addr[18];
 
+    // read information from socket s by ioctl and fill &di (device information)
 	if (ioctl(s, HCIGETDEVINFO, (void *) &di))
 		return 0;
 
+    // translate BT addr to string
 	ba2str(&di.bdaddr, addr);
 	printf("\t%s\t%s\n", di.name, addr);
 	return 0;

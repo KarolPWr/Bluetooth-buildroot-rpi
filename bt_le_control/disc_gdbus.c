@@ -1,5 +1,6 @@
 #define _GNU_SOURCE
 #include <stdio.h>
+#include <stdint.h>
 #include <errno.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -12,10 +13,10 @@
 
 #include <glib.h>
 
-// #include "src/shared/util.h"
-// #include "src/shared/queue.h"
-// #include "src/shared/io.h"
-// #include "src/shared/shell.h"
+#include "src/shared/util.h"
+#include "src/shared/queue.h"
+#include "src/shared/io.h"
+#include "src/shared/shell.h"
 #include "gdbus/gdbus.h"
 // #include "gatt.h"
 
@@ -89,6 +90,84 @@ struct sock_io {
 
 static struct sock_io write_io;
 static struct sock_io notify_io;
+
+static void print_chrc(struct chrc *chrc, const char *description)
+{
+	const char *text;
+
+	text = bt_uuidstr_to_str(chrc->uuid);
+	if (!text)
+		printf("%s%s%sCharacteristic (Handle 0x%04x)\n\t%s\n\t"
+					"%s\n",
+					description ? "[" : "",
+					description ? : "",
+					description ? "] " : "",
+					chrc->handle, chrc->path, chrc->uuid);
+	else
+		printf("%s%s%sCharacteristic (Handle 0x%04x)\n\t%s\n\t"
+					"%s\n\t%s\n",
+					description ? "[" : "",
+					description ? : "",
+					description ? "] " : "",
+					chrc->handle, chrc->path, chrc->uuid,
+					text);
+}
+
+static void print_desc(struct desc *desc, const char *description)
+{
+	const char *text;
+
+	text = bt_uuidstr_to_str(desc->uuid);
+	if (!text)
+		printf("%s%s%sDescriptor (Handle 0x%04x)\n\t%s\n\t"
+					"%s\n",
+					description ? "[" : "",
+					description ? : "",
+					description ? "] " : "",
+					desc->handle, desc->path, desc->uuid);
+	else
+		printf("%s%s%sDescriptor (Handle 0x%04x)\n\t%s\n\t"
+					"%s\n\t%s\n",
+					description ? "[" : "",
+					description ? : "",
+					description ? "] " : "",
+					desc->handle, desc->path, desc->uuid,
+					text);
+}
+
+static void print_descriptor(GDBusProxy *proxy, const char *description)
+{
+	struct desc desc;
+	DBusMessageIter iter;
+	const char *uuid;
+
+	if (g_dbus_proxy_get_property(proxy, "UUID", &iter) == FALSE)
+		return;
+
+	dbus_message_iter_get_basic(&iter, &uuid);
+
+	desc.path = (char *) g_dbus_proxy_get_path(proxy);
+	desc.uuid = (char *) uuid;
+
+	print_desc(&desc, description);
+}
+
+static void print_characteristic(GDBusProxy *proxy, const char *description)
+{
+	struct chrc chrc;
+	DBusMessageIter iter;
+	const char *uuid;
+
+	if (g_dbus_proxy_get_property(proxy, "UUID", &iter) == FALSE)
+		return;
+
+	dbus_message_iter_get_basic(&iter, &uuid);
+
+	chrc.path = (char *) g_dbus_proxy_get_path(proxy);
+	chrc.uuid = (char *) uuid;
+
+	print_chrc(&chrc, description);
+}
 
 static void print_service(struct service *service, const char *description)
 {
@@ -165,6 +244,11 @@ static void list_attributes(const char *path, GList *source)
 		} else if (source == descriptors)
 			print_descriptor(proxy, NULL);
 	}
+}
+
+int main(void){
+	printf("Start");
+
 }
 
 
