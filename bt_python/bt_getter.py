@@ -8,7 +8,7 @@ if __name__ == "__main__":
     dev = btle.Peripheral("DB:1A:7C:4D:6D:4B", addrType="random")
 
     raw = dev.readCharacteristic(0x17)
-    print(raw)
+    print(raw.hex())
     raw = dev.readCharacteristic(0x17)
     print(raw)
 
