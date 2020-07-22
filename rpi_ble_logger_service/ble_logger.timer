@@ -1,0 +1,11 @@
+[Unit]
+Description=Logs BLE temperature to journal
+Requires=ble_logger.service
+
+[Timer]
+Unit=ble_logger.service
+AccuracySec=1s
+OnCalendar=*-*-* *:*:00
+
+[Install]
+WantedBy=timers.target
