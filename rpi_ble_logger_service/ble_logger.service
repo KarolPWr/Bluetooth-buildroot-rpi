@@ -1,0 +1,9 @@
+[Unit]
+Description=BLE logger
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /usr/bin/bt_getter.py
+
+[Install]
+WantedBy=multi-user.target
