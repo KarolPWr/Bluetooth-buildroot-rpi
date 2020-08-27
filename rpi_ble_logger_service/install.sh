@@ -8,3 +8,5 @@ chmod 644 /etc/systemd/system/ble_logger.service
 
 cp ble_logger.timer /etc/systemd/system/ble_logger.timer
 chmod 644 /etc/systemd/system/ble_logger.timer
+
+systemctl daemon-reload
