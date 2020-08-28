@@ -5,7 +5,7 @@ Requires=ble_logger.service
 [Timer]
 Unit=ble_logger.service
 AccuracySec=1s
-OnCalendar=*-*-* *:*:00
+OnCalendar=*:0/15
 
 [Install]
 WantedBy=timers.target

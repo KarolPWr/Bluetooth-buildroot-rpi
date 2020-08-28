@@ -1,0 +1,17 @@
+Download dependencies:
+https://github.com/IanHarvey/bluepy
+
+Check if bluetooth is working 
+$ sudo python3 bt_getter.py
+
+If not, then could be that BLE adapter on pi is not working. Try these debug commands:
+$ systemctl status bluetooth
+$ rfkill list 
+$ bluetoothctl power on
+
+Once python program is working, BLE timer and service can be installed. 
+$ chmod +x install.sh
+$ sudo ./install.sh
+
+Check if timer was properly installed
+$ systemctl status ble_logger.service   # should print temperature readout

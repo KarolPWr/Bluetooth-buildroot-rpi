@@ -3,6 +3,7 @@ from time import sleep
 import logging
 import sys
 import struct 
+import sqlite3
 
 logging.basicConfig(level = logging.DEBUG)
 
@@ -18,6 +19,17 @@ def convert_to_le(el_number):
     le_number = struct.unpack("<I", struct.pack(">I", le_number))[0]
     le_number = le_number>>16 
     return le_number/100
+
+def log_temperature(temp):
+    """ 
+    Write sensor readout to the database.
+    """
+    temp = temp
+    conn=sqlite3.connect('/var/www/ble_templog.db')
+    curs=conn.cursor()
+    curs.execute("INSERT INTO temps values(datetime('now', 'localtime'), (?))", (temp,))
+    conn.commit()
+    conn.close()
 
 
 if __name__ == "__main__":
@@ -51,3 +63,7 @@ if __name__ == "__main__":
 
     readable_temp = convert_to_le(raw_temp.hex())
     logger.debug("Human-readable temperature: {}".format(readable_temp))
+
+    logger.debug("Commiting sensor values to database...")
+    log_temperature(readable_temp)
+    logger.debug("Done!")
