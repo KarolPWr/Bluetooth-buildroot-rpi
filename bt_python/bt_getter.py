@@ -13,12 +13,12 @@ def convert_to_le(el_number):
     """
     Pack as big endian, unpack as little endian
     Convert to 32bit number (discard not relevant 0s)
-    return as XX.YY (readable temperature)
+    return as XXYY (readable temperature)
     """
     le_number = int(el_number, 16)
     le_number = struct.unpack("<I", struct.pack(">I", le_number))[0]
     le_number = le_number>>16 
-    return le_number/100
+    return le_number
 
 def log_temperature(temp):
     """ 
@@ -30,6 +30,15 @@ def log_temperature(temp):
     curs.execute("INSERT INTO temps values(datetime('now', 'localtime'), (?))", (temp,))
     conn.commit()
     conn.close()
+
+def read_chrc_value(dev, handle):
+    assert(isinstance(handle, int))
+
+    raw_val = dev.readCharacteristic(handle)
+    logger.debug("Raw characteristic value: {}".format(raw_val.hex()))
+
+    readable_val = convert_to_le(raw_val.hex())
+    return readable_val
 
 
 if __name__ == "__main__":
@@ -54,16 +63,14 @@ if __name__ == "__main__":
         logger.debug(str(svc))
         svc.getCharacteristics()
 
+    raw_val = read_chrc_value(dev, 0x17)
+    logger.debug("Temperature value: {} C".format(raw_val/100))
+    raw_val = read_chrc_value(dev, 0x1e)
+    logger.debug("Humidity value: {} %".format(raw_val/100))
+    raw_val = read_chrc_value(dev, 0x22)
+    logger.debug("Pressure value: {} hPa".format(raw_val))
 
-    tempService = dev.getServiceByUUID("0000181a-0000-1000-8000-00805f9b34fb")
-    temp_char = tempService.getCharacteristics()[0]
 
-    raw_temp = temp_char.read()
-    logger.debug("Raw temperature: {}".format(raw_temp.hex()))
-
-    readable_temp = convert_to_le(raw_temp.hex())
-    logger.debug("Human-readable temperature: {}".format(readable_temp))
-
-    logger.debug("Commiting sensor values to database...")
-    log_temperature(readable_temp)
-    logger.debug("Done!")
+    # logger.debug("Commiting sensor values ({}) to database...".format(readable_val/100))
+    # log_temperature(readable_val)
+    # logger.debug("Done!")

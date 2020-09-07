@@ -21,6 +21,13 @@ Main algo:
 - Store read value
 
 
+UUIDs:
+0x2A6E - temperature   #handle: 0x0017
+0x2A6F - humidity   #handle: 0x001e
+0x2A6D - pressure   #handle: 0x0022
+
+
+
 
 
 
