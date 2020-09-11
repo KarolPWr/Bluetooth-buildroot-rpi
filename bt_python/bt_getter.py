@@ -20,18 +20,22 @@ def convert_to_le(el_number):
     le_number = le_number>>16 
     return le_number
 
-def log_temperature(temp):
+def log_data_to_db(table_name, value):
     """ 
     Write sensor readout to the database.
     """
-    temp = temp
     conn=sqlite3.connect('/var/www/ble_templog.db')
+    sqlite_cmd = "INSERT INTO {table_name} values(datetime('now', 'localtime'), ({value}))".format(table_name=table_name, value=value)
     curs=conn.cursor()
-    curs.execute("INSERT INTO temps values(datetime('now', 'localtime'), (?))", (temp,))
+    curs.execute(sqlite_cmd)
     conn.commit()
     conn.close()
 
 def read_chrc_value(dev, handle):
+    """
+    Read characteristic using service UUID
+    Convert to readable value and return
+    """
     assert(isinstance(handle, int))
 
     raw_val = dev.readCharacteristic(handle)
@@ -42,7 +46,12 @@ def read_chrc_value(dev, handle):
 
 
 if __name__ == "__main__":
-    
+    handle_to_char_map = {
+        "temperature": 0x17,
+        "humidity": 0x1e,
+        "pressure": 0x22,
+    }
+
 
     for attempt in range(10):
         try:
@@ -63,14 +72,19 @@ if __name__ == "__main__":
         logger.debug(str(svc))
         svc.getCharacteristics()
 
-    raw_val = read_chrc_value(dev, 0x17)
-    logger.debug("Temperature value: {} C".format(raw_val/100))
-    raw_val = read_chrc_value(dev, 0x1e)
-    logger.debug("Humidity value: {} %".format(raw_val/100))
-    raw_val = read_chrc_value(dev, 0x22)
-    logger.debug("Pressure value: {} hPa".format(raw_val))
+    temp_val = read_chrc_value(dev, handle_to_char_map["temperature"])/100
+    logger.debug("Temperature value: {} C".format(temp_val))
+    hum_val = read_chrc_value(dev, handle_to_char_map["humidity"])/100
+    logger.debug("Humidity value: {} %".format(hum_val))
+    pressure_val = read_chrc_value(dev, handle_to_char_map["pressure"])
+    logger.debug("Pressure value: {} hPa".format(pressure_val))
 
-
-    # logger.debug("Commiting sensor values ({}) to database...".format(readable_val/100))
-    # log_temperature(readable_val)
-    # logger.debug("Done!")
+    table_to_value_map = {
+        "temps": temp_val,
+        "pressure": pressure_val,
+        "humidity": hum_val
+    }
+    for table,value in table_to_value_map.items():
+        logger.debug("Commiting sensor value ({}) to table...".format(table))
+        log_data_to_db(table, value)
+        logger.debug("Done!")
